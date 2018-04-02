@@ -90,32 +90,34 @@ class Interval:
     """
     
     @total_ordering
-    class _INF:
+    class _Infinity:
         """
         Use to represent positive or negative infinity.
         """
-        def __init__(self, pos=True):
-            self.pos = pos
+        def __init__(self, sign=True):
+            self._sign = sign
+        
+        def __neg__(self):
+            return self.__class__(not self._sign)
             
         def __lt__(self, o):
-            return not self.pos
+            return not self._sign
             
         def __gt__(self, o):
-            return self.pos
+            return self._sign
             
         def __eq__(self, o):
-            if isinstance(o, Interval._INF):
-                return o.pos == self.pos
+            if isinstance(o, self.__class__):  # Exact type matching
+                return o.sign == self._sign
             else:
                 return False
                 
         def __repr__(self):
-            return '+inf' if self.pos else '-inf'
+            return '+inf' if self._sign else '-inf'
     
     OPEN = 0
     CLOSED = 1
-    P_INF = _INF(True)
-    N_INF = _INF(False)
+    INF = _Infinity()
     
     def __init__(self, left, lower, upper, right):
         if lower > upper:
