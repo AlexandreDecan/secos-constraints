@@ -117,6 +117,11 @@ def test_set_union():
     assert Interval.closed(v1, v2) | Interval.closed(v3, v4) == IntervalSet(Interval.closed(v1, v2), Interval.closed(v3, v4))
     assert Interval.closed(v1, v2) | Interval.closed(v3, v4) | Interval.closed(v2, v3) == IntervalSet(Interval.closed(v1, v4))
     
+    assert (
+        Interval.closed(1, 2) | Interval.closed(3, 4) | Interval.closed(4, 6) | Interval.closed(5, 6) | Interval.open(7, 7)
+        == IntervalSet(Interval.closed(1, 2), Interval.closed(3, 6))
+    )
+
 
 def test_set_to_interval():
     v1, v2, v3, v4 = Version('1.0.0'), Version('2.0.0'), Version('3.0.0'), Version('4.0.0')
