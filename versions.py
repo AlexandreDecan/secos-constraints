@@ -325,7 +325,7 @@ class IntervalSet:
     def __iter__(self):
         return iter(self.intervals)
     
-    def __containts__(self, item):
+    def __contains__(self, item):
         for i in self.intervals:
             if item in i:
                 return True
