@@ -148,10 +148,10 @@ class Interval:
         else:
             return NotImplemented
 
-    def overlaps(self, other, contigous=False):
+    def overlaps(self, other, contiguous=False):
         """
         Return True if sets have any overlapping value.
-        If 'contigous' is set to True, it considers [1, 2) and [2, 3] as an
+        If 'contiguous' is set to True, it considers [1, 2) and [2, 3] as an
         overlap on value 2, not [1, 2) and (2, 3].
         """
         if self.lower > other.lower:
@@ -163,7 +163,7 @@ class Interval:
         #    return False
          
         if first.upper == second.lower:
-            if contigous:
+            if contiguous:
                 return first.right == Interval.CLOSED or second.right == Interval.CLOSED
             else:
                 return first.right == Interval.CLOSED and second.right == Interval.CLOSED
@@ -195,7 +195,7 @@ class Interval:
 
     def __or__(self, other):
         if isinstance(other, Interval):
-            if self.overlaps(other, contigous=True):
+            if self.overlaps(other, contiguous=True):
                 if self.lower == other.lower:
                     lower = self.lower
                     left = self.left if self.left == Interval.OPEN else other.left
@@ -265,11 +265,11 @@ class IntervalSet:
                 to_remove.add(i1)
         self.intervals = self.intervals.difference(to_remove)
         
-        # Merge contigous intervals
+        # Merge contiguous intervals
         to_remove = set()
         to_add = set()
         for i1, i2 in combinations(self.intervals, 2):
-            if i1 not in to_remove and i2 not in to_remove and i1.overlaps(i2, contigous=True):
+            if i1 not in to_remove and i2 not in to_remove and i1.overlaps(i2, contiguous=True):
                 # Merge i1 and i2
                 i3 = i1 | i2
                 assert isinstance(i3, Interval)
