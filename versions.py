@@ -47,7 +47,6 @@ class Version:
         """
         v = Version('0.0.0')
         v.major = float('-inf')
-        v.__repr__ = lambda s: '-inf'
         
         return v
         
@@ -58,7 +57,6 @@ class Version:
         """
         v = Version('0.0.0')
         v.major = float('inf')
-        v.__repr__ = lambda s: 'inf'
         
         return v
             
@@ -97,7 +95,10 @@ class Version:
             return NotImplemented
     
     def __repr__(self):
-        return '{}.{}.{}{}'.format(self.major, self.minor, self.patch, self.misc if self.misc else '')
+        if self.major in [float('inf'), float('-inf')]:
+            return str(self.major)
+        else:
+            return '{}.{}.{}{}'.format(self.major, self.minor, self.patch, self.misc if self.misc else '')
 
 
 class Interval:
@@ -233,7 +234,7 @@ class Interval:
             return self._contains_value(item)
 
     def __repr__(self):
-        return '{}{}:{}{}'.format(
+        return '{}{},{}{}'.format(
             '[' if self.left == Interval.CLOSED else ']',
             repr(self.lower),
             repr(self.upper),
