@@ -39,27 +39,7 @@ class Version:
             return Version(int(v['major']), int(v['minor']), int(v['patch']), v['misc'])
         else:
             raise ValueError('Cannot parse {}'.format(string))
-            
-    @staticmethod
-    def lowest():
-        """
-        Lowest possible version.
-        """
-        v = Version('0.0.0')
-        v.major = float('-inf')
-        
-        return v
-        
-    @staticmethod
-    def highest():
-        """
-        Highest possible version.
-        """
-        v = Version('0.0.0')
-        v.major = float('inf')
-        
-        return v
-            
+    
     def __eq__(self, other):
         if isinstance(other, Version):
             return (
@@ -108,8 +88,34 @@ class Interval:
     
     Inspiration taken from https://github.com/intiocean/pyinter
     """
+    
+    @total_ordering
+    class _INF:
+        """
+        Use to represent positive or negative infinity.
+        """
+        def __init__(self, pos=True):
+            self.pos = pos
+            
+        def __lt__(self, o):
+            return not self.pos
+            
+        def __gt__(self, o):
+            return self.pos
+            
+        def __eq__(self, o):
+            if isinstance(o, Interval._INF):
+                return o.pos == self.pos
+            else:
+                return False
+                
+        def __repr__(self):
+            return '+inf' if self.pos else '-inf'
+    
     OPEN = 0
     CLOSED = 1
+    P_INF = _INF(True)
+    N_INF = _INF(False)
     
     def __init__(self, left, lower, upper, right):
         if lower > upper:

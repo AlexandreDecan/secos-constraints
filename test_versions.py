@@ -34,7 +34,7 @@ def test_versions_comparison():
         assert v2 > v1
         assert v2 >= v1
         
-        assert Version.lowest() < v1 < Version.highest()
+        assert Interval.N_INF < v1 < Interval.P_INF
 
 
 def test_range_containment():
@@ -47,8 +47,8 @@ def test_range_containment():
     
     assert Interval.open(v1, v2) in Interval.closed(v1, v2)
     
-    assert Interval.closed(v1, v2) in Interval.closed(v1, Version.highest())
-    assert v1 in Interval.closed(v1, Version.highest())
+    assert Interval.closed(v1, v2) in Interval.closed(v1, Interval.P_INF)
+    assert v1 in Interval.closed(v1, Interval.P_INF)
         
     assert v1 not in Interval.open(v1, v2)
     assert v2 not in Interval.open(v1, v2)
@@ -58,8 +58,8 @@ def test_range_and():
     v1, v2, v3, v4 = Version('1.0.0'), Version('2.0.0'), Version('3.0.0'), Version('4.0.0')
     
     assert Interval.closed(v1, v3) & Interval.closed(v2, v4) == Interval.closed(v2, v3)
-    assert Interval.closed(v1, Version.highest()) & Interval.closed(v2, v4) == Interval.closed(v2, v4)
-    assert Interval.closed(Version.lowest(), v2) & Interval.closed(v1, v4) == Interval.closed(v1, v2)
+    assert Interval.closed(v1, Interval.P_INF) & Interval.closed(v2, v4) == Interval.closed(v2, v4)
+    assert Interval.closed(Interval.N_INF, v2) & Interval.closed(v1, v4) == Interval.closed(v1, v2)
     
     assert Interval.closed(v1, v2) & Interval.closed(v1, v2) == Interval.closed(v1, v2)
     assert Interval.closed(v1, v2) & Interval.closed(v2, v3) == Interval.closed(v2, v2)
