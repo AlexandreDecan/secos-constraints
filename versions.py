@@ -108,7 +108,7 @@ class Interval:
             
         def __eq__(self, o):
             if isinstance(o, self.__class__):  # Exact type matching
-                return o.sign == self._sign
+                return o._sign == self._sign
             else:
                 return False
                 
