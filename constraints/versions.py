@@ -74,7 +74,4 @@ class Version:
             return NotImplemented
     
     def __repr__(self):
-        if self.major in [float('inf'), float('-inf')]:
-            return str(self.major)
-        else:
-            return '{}.{}.{}{}'.format(self.major, self.minor, self.patch, self.misc if self.misc else '')
+        return '{}.{}.{}{}'.format(self.major, self.minor, self.patch, self.misc if self.misc else '')
