@@ -73,5 +73,14 @@ class Version:
         else:
             return NotImplemented
     
+    def __sub__(self, other):
+        if isinstance(other, Version):
+            major = self.major - other.major
+            minor = self.minor - other.minor
+            patch = self.patch - other.patch
+            return major, minor, patch
+        else:
+            return NotImplemented
+    
     def __repr__(self):
         return '{}.{}.{}{}'.format(self.major, self.minor, self.patch, self.misc if self.misc else '')

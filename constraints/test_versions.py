@@ -33,3 +33,13 @@ def test_versions_comparison():
         assert v1 <= v2
         assert v2 > v1
         assert v2 >= v1
+
+
+def test_difference():
+    assert Version('1.0.0') - Version('1.0.0') == (0, 0, 0)
+    assert Version('1.0.0') - Version('0.0.0') == (1, 0, 0)
+    assert Version('1.2.3') - Version('1.2.3') == (0, 0, 0)
+    assert Version('2.4.6') - Version('1.2.3') == (1, 2, 3)
+    assert Version('1.2.3') - Version('2.4.6') == (-1, -2, -3)
+    assert Version('2.0.0') - Version('1.2.3') == (1, -2, -3)
+    assert Version('2.2.3') - Version('1.3.5') == (1, -1, -2)
