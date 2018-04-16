@@ -1,5 +1,6 @@
 import re
 from functools import total_ordering
+from numbers import Number
 
 
 @total_ordering
@@ -19,7 +20,7 @@ class Version:
             patch = version.patch
             misc = version.misc
         
-        if isinstance(major_or_str, int) and isinstance(minor, int) and isinstance(patch, int):
+        if isinstance(major_or_str, Number) and isinstance(minor, Number) and isinstance(patch, Number):
             self.major = major_or_str
             self.minor = minor
             self.patch = patch
@@ -84,3 +85,13 @@ class Version:
     
     def __repr__(self):
         return '{}.{}.{}{}'.format(self.major, self.minor, self.patch, self.misc if self.misc else '')
+
+
+def strict(self):
+    if self.upper_bounded and self.lower_bounded:
+        M, m, p = self.interval.upper - self.interval.lower
+        return (
+           M + m + p == 0
+           or (p == 1 and self.interval.left == I.OPEN or self.interval.right == I.OPEN)
+        )
+    
