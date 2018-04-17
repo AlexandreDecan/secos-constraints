@@ -87,11 +87,4 @@ class Version:
         return '{}.{}.{}{}'.format(self.major, self.minor, self.patch, self.misc if self.misc else '')
 
 
-def strict(self):
-    if self.upper_bounded and self.lower_bounded:
-        M, m, p = self.interval.upper - self.interval.lower
-        return (
-           M + m + p == 0
-           or (p == 1 and self.interval.left == I.OPEN or self.interval.right == I.OPEN)
-        )
-    
+Version.FIRST = Version(0, 0, 0)
