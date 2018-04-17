@@ -286,21 +286,20 @@ class NPMParser(InlineTransformer):
     grammar = r"""
     constraints: [range_set]
     range_set  : range ( "||" range ) *
-    range      : [hyphen | simple ( " " simple ) *]
-    hyphen     : partial " - " partial
+    range      : hyphen | simple ( " " simple ) *
+    hyphen.1   : partial " - " partial
     simple     : primitive | partial | tilde | caret
     primitive  : [OP] partial
     OP         : "<=" | ">=" | ">" | "<" | "="
-    partial    : ("v"|"V")? xr ( "." xr ( "." xr qualifier ? )? )?
-    ?xr        : "x" | "X" | "*" | nr
-    ?nr        : /0|[1-9]([0-9])*/
+    partial    : ("v"|"V")? XR ( "." XR ( "." XR qualifier ? )? )?
+    XR        : "x" | "X" | "*" | /0|[1-9]([0-9])*/
     tilde      : "~" partial
     caret      : "^" partial
     ?qualifier : ( "-" pre )? ( "+" build )?
     ?pre       : parts
     ?build     : parts
     ?parts     : part ( "." part ) *
-    ?part      : nr | /[\-0-9A-Za-z]+/
+    ?part      : /0|[1-9]([0-9])*/ | /[\-0-9A-Za-z]+/
     
     %import common.WS
     %ignore WS
@@ -389,14 +388,18 @@ class NPMParser(InlineTransformer):
         if version is None:
             version = op
             op = '='
-        
-        major, minor, patch = version
             
-        if major == '*':
+        major, minor, patch = version
+        # Desugar *
+        major = None if major == '*' else major
+        minor = None if minor == '*' else minor
+        patch = None if patch == '*' else patch
+        
+        if major is None:
             return I.closedopen(Version.FIRST, I.inf)
-        elif minor == '*':
+        elif minor is None:
             return minor_interval(Version(major, 0, 0))
-        elif patch == '*':
+        elif patch is None:
             return patch_interval(Version(major, minor, 0))
         else:
             return comparator_interval(op, Version(major, minor, patch))
@@ -407,7 +410,7 @@ class NPMParser(InlineTransformer):
         
         lminor = 0 if lminor is None else lminor
         lpatch = 0 if lpatch is None else lpatch
-        
+
         if rminor is None:
             # 1.0.0 - 2 := >=1.0.0 <3.0.0 because "2" becames "2.*.*"
             return I.closedopen(
