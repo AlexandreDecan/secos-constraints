@@ -1,11 +1,13 @@
 import pytest
-from versions import Version
-from constraints import (
+import intervals as I
+
+from .versions import Version
+from .constraints import (
     allows_major, allows_minor, allows_patch,
     strict, upper_bounded, lower_bounded
 )
 
-import intervals as I
+
 
 
 def test_strict_constraints():

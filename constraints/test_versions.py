@@ -1,5 +1,5 @@
 import pytest
-from versions import Version
+from .versions import Version
 
 
 def test_create_versions():

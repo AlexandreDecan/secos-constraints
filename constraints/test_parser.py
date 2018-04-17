@@ -1,11 +1,12 @@
 import pytest
 import intervals as I
 
-from parser import CargoParser, RubyGemsParser, PackagistParser
-from versions import Version
+from .parser import CargoParser, RubyGemsParser, PackagistParser
+from .versions import Version
 
 
 basic_examples = [
+    ('', '[0.0.0,+inf)'),
     ('=1.2.3', '[1.2.3]'),
     ('>1.2.3', '(1.2.3,+inf)'),
     ('>=1.2.3', '[1.2.3,+inf)'),

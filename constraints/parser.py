@@ -1,6 +1,6 @@
 import intervals as I
-from versions import Version
-from constraints import minor_interval, patch_interval, comparator_interval
+from .versions import Version
+from .constraints import minor_interval, patch_interval, comparator_interval
 
 from lark import Lark, InlineTransformer
 
@@ -8,7 +8,8 @@ from lark import Lark, InlineTransformer
 class CargoParser(InlineTransformer):
     # https://doc.rust-lang.org/cargo/reference/specifying-dependencies.html
     grammar = """
-    constraints: [constraint ("," constraint)*]
+    constraints: [conjunction]
+    conjunction: constraint ("," constraint)*
 
     constraint: [OP] version
     OP: "=" | "<=" | "<" | ">=" | ">" | "~" | "^"
@@ -30,7 +31,10 @@ class CargoParser(InlineTransformer):
     def parse(self, text):
         return self.transform(self._parser.parse(text))
         
-    def constraints(self, *intervals):
+    def constraints(self, interval=None):
+        return I.closed(Version.FIRST, I.inf) if interval is None else interval
+
+    def conjunction(self, *intervals):
         interval = I.closedopen(Version.FIRST, I.inf)
         for other_interval in intervals:
             interval = interval & other_interval
@@ -106,7 +110,8 @@ class RubyGemsParser(InlineTransformer):
     # http://guides.rubygems.org/patterns/#declaring-dependencies
     # https://www.devalot.com/articles/2012/04/gem-versions.html
     grammar = """
-    constraints: [constraint ("," constraint)*]
+    constraints: [conjunction]
+    conjunction: constraint ("," constraint)*
 
     constraint: [OP] version
     OP: "!=" | "=" | "<=" | "<" | ">=" | ">" | "~>"
@@ -127,8 +132,11 @@ class RubyGemsParser(InlineTransformer):
         
     def parse(self, text):
         return self.transform(self._parser.parse(text))
-        
-    def constraints(self, *intervals):
+
+    def constraints(self, interval=None):
+        return I.closed(Version.FIRST, I.inf) if interval is None else interval
+
+    def conjunction(self, *intervals):
         interval = I.closedopen(Version.FIRST, I.inf)
         for other_interval in intervals:
             interval = interval & other_interval
@@ -166,7 +174,8 @@ class RubyGemsParser(InlineTransformer):
 class PackagistParser(InlineTransformer):
     # https://getcomposer.org/doc/articles/versions.md#writing-version-constraints
     grammar = """
-    disjunction: [conjunction ("||" conjunction)*]
+    constraints: [disjunction]
+    disjunction: conjunction ("||" conjunction)*
     conjunction: constraint ([","] constraint)*
 
     constraint: [OP] version           -> constraint_operator
@@ -185,10 +194,13 @@ class PackagistParser(InlineTransformer):
     """
 
     def __init__(self):
-        self._parser = Lark(self.grammar, start='disjunction')
+        self._parser = Lark(self.grammar, start='constraints')
 
     def parse(self, text):
         return self.transform(self._parser.parse(text))
+
+    def constraints(self, interval=None):
+        return I.closed(Version.FIRST, I.inf) if interval is None else interval
 
     def disjunction(self, *intervals):
         interval = I.empty()

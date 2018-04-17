@@ -1,5 +1,5 @@
 import intervals as I
-from versions import Version
+from .versions import Version
 
 
 def upper_bounded(interval):
