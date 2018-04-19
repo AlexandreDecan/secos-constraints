@@ -5,6 +5,14 @@ from .constraints import minor_interval, patch_interval, comparator_interval
 from lark import Lark, InlineTransformer
 
 
+def parse_or_none(parser, text):
+    try:
+        return parser.parse(text)
+    except Exception as e:
+        print('E:', text)
+        return None
+
+
 class CargoParser(InlineTransformer):
     # https://doc.rust-lang.org/cargo/reference/specifying-dependencies.html
     grammar = """
@@ -18,7 +26,7 @@ class CargoParser(InlineTransformer):
     MAJOR: INT | "*"
     MINOR: INT | "*"
     PATCH: INT | "*"
-    MISC: /[0-9A-Za-z-]+/
+    MISC: /[\.0-9A-Za-z-]+/
 
     %import common.INT
     %import common.WS
@@ -120,7 +128,7 @@ class RubyGemsParser(InlineTransformer):
     MAJOR: INT
     MINOR: INT
     PATCH: INT
-    MISC: /[0-9A-Za-z-]+/
+    MISC: /[\.0-9A-Za-z-]+/
 
     %import common.INT
     %import common.WS
@@ -181,12 +189,12 @@ class PackagistParser(InlineTransformer):
     constraint: [OP] version           -> constraint_operator
               | version "-" version    -> constraint_range
     OP: "!=" | "=" | "<=" | "<" | ">=" | ">" | "~" | "^"
-    version: MAJOR ("." MINOR ("." PATCH ("-" MISC)?)?)?
+    version: ("v" | "V")? MAJOR ("." MINOR ("." PATCH)? (("-" | "@") MISC)?)?
 
     MAJOR: INT
     MINOR: INT | "*"
     PATCH: INT | "*"
-    MISC: /[0-9A-Za-z-]+/
+    MISC: /[\.0-9A-Za-z-]+/
 
     %import common.INT
     %import common.WS
@@ -275,6 +283,10 @@ class PackagistParser(InlineTransformer):
         assert False, (op, version)
         
     def version(self, major, minor=None, patch=None, misc=None):
+        if patch is not None and not str.isdigit(patch):
+            misc = patch
+            patch = None
+            
         return tuple(
             int(x) if (x is not None and str.isdigit(x)) else x
             for x in (major, minor, patch)
