@@ -1,3 +1,13 @@
-Download Libraries.io-open-data-1.2.0.tar.gz from https://zenodo.org/record/1196312
+- Download Libraries.io-open-data-1.2.0.tar.gz from https://zenodo.org/record/1196312
+wget https://zenodo.org/record/1196312/files/Libraries.io-open-data-1.2.0.tar.gz
 
-Extract versions.csv and dependencies.csv then run convert.py
+- Extract versions.csv and dependencies.csv 
+tar -xvzf Libraries.io-open-data-1.2.0.tar.gz dependencies-1.2.0-2018-03-12.csv versions-1.2.0-2018-03-12.csv
+
+- Rename files
+mv dependencies-1.2.0-2018-03-12.csv dependencies.csv
+mv versions-1.2.0-2018-03-12.csv versions.csv
+
+- Run convert.py
+python convert.py 
+
