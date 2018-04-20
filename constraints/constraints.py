@@ -2,6 +2,10 @@ import intervals as I
 from .versions import Version
 
 
+def empty(interval):
+    return interval.is_empty()
+    
+
 def upper_bounded(interval):
     if isinstance(interval, I.Interval):
         return upper_bounded(interval.to_atomic())
@@ -22,7 +26,10 @@ def lower_bounded(interval):
 
 def strict(interval):
     if isinstance(interval, I.Interval):
-        return strict(interval.to_atomic())
+        try:
+            return strict(interval[0])
+        except IndexError:  # empty interval
+            return False
     elif isinstance(interval, I.AtomicInterval):
         return not allows_patch(interval, soft=False)
     else:
@@ -31,7 +38,10 @@ def strict(interval):
 
 def allows_major(interval, soft=True):
     if isinstance(interval, I.Interval):
-        interval = I.Interval(interval[-1]) if soft else interval
+        try:
+            interval = I.Interval(interval[-1]) if soft else interval
+        except IndexError:  # empty interval
+            return False
         return any(allows_major(i, soft) for i in interval)
     elif isinstance(interval, I.AtomicInterval):
         inc = float('inf') if soft else 1 + int(interval.left == I.OPEN)
@@ -43,7 +53,10 @@ def allows_major(interval, soft=True):
 
 def allows_minor(interval, soft=True):
     if isinstance(interval, I.Interval):
-        interval = I.Interval(interval[-1]) if soft else interval
+        try:
+            interval = I.Interval(interval[-1]) if soft else interval
+        except IndexError:  # empty interval
+            return False
         return any(allows_minor(i, soft) for i in interval)
     elif isinstance(interval, I.AtomicInterval):
         inc = float('inf') if soft else 1 + int(interval.left == I.OPEN)
@@ -55,7 +68,10 @@ def allows_minor(interval, soft=True):
 
 def allows_patch(interval, soft=True):
     if isinstance(interval, I.Interval):
-        interval = I.Interval(interval[-1]) if soft else interval
+        try:
+            interval = I.Interval(interval[-1]) if soft else interval
+        except IndexError:  # empty interval
+            return False
         return any(allows_patch(i, soft) for i in interval)
     elif isinstance(interval, I.AtomicInterval):
         inc = float('inf') if soft else 1 + int(interval.left == I.OPEN)
@@ -67,16 +83,19 @@ def allows_patch(interval, soft=True):
 
 def dev(interval):
     if isinstance(interval, I.Interval):
-        return all(dev(i) for i in interval)
+        # Whyt not all(dev(i) for i in interval)?
+        # .. because it returns True if interval is empty.
+        return not any([not dev(i) for i in interval])
     elif isinstance(interval, I.AtomicInterval):
-        return (
-            interval.upper.major == 0 or (
-                interval.upper.major == 1
-                and interval.upper.minor == 0
-                and interval.upper.patch == 0
-                and interval.right == I.OPEN
-            )
-        )
+        return interval <= I.closedopen(Version(0, 0, 0), Version(1, 0, 0))
+        # (
+        #     interval.upper.major == 0 or (
+        #         interval.upper.major == 1
+        #         and interval.upper.minor == 0
+        #         and interval.upper.patch == 0
+        #         and interval.right == I.OPEN
+        #     )
+        # )
     else:
         raise TypeError('Parameter must be an Interval or an AtomicInterval instance.')
 

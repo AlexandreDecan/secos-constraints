@@ -5,12 +5,13 @@ from .constraints import minor_interval, patch_interval, comparator_interval
 from lark import Lark, InlineTransformer
 
 
-def parse_or_none(parser, text):
+def parse_or_empty(parser, text, verbose=False):
     try:
         return parser.parse(text)
     except Exception as e:
-        print('E:', text)
-        return None
+        if verbose:
+            print('E:', text)
+        return I.empty()
 
 
 class CargoParser(InlineTransformer):
