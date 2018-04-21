@@ -19,6 +19,8 @@ jupyter==1.0.0
 jupyter-client==5.2.3
 jupyter-console==5.2.0
 jupyter-core==4.4.0
+jupyterlab==0.32.0
+jupyterlab-launcher==0.10.5
 kiwisolver==1.0.1
 lark-parser==0.5.6
 MarkupSafe==1.0
