@@ -184,7 +184,7 @@ class PackagistParser(InlineTransformer):
     # https://getcomposer.org/doc/articles/versions.md#writing-version-constraints
     grammar = """
     constraints: [disjunction]
-    disjunction: conjunction ("||" conjunction)*
+    disjunction: conjunction (("|" | "||") conjunction)*
     conjunction: constraint ([","] constraint)*
 
     constraint: [OP] version           -> constraint_operator
@@ -192,7 +192,7 @@ class PackagistParser(InlineTransformer):
     OP: "!=" | "=" | "<=" | "<" | ">=" | ">" | "~" | "^"
     version: ("v" | "V")? MAJOR ("." MINOR ("." PATCH)? (("-" | "@") MISC)?)?
 
-    MAJOR: INT
+    MAJOR: INT | "*"
     MINOR: INT | "*"
     PATCH: INT | "*"
     MISC: /[\.0-9A-Za-z-]+/
@@ -253,7 +253,9 @@ class PackagistParser(InlineTransformer):
             
         major, minor, patch = version
 
-        if minor == '*':
+        if major == '*':
+            return I.closedopen(Version.FIRST, I.inf)
+        elif minor == '*':
             return minor_interval(Version(major, 0, 0))
         elif patch == '*':
             return patch_interval(Version(major, minor, 0))
