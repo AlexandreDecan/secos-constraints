@@ -56,7 +56,7 @@ if __name__ == '__main__':
         df_constraints['interval'] = df_constraints['constraint'].apply(_func)
         
         print('.. analyse intervals')
-        for label in ['empty', 'allows_major', 'allows_minor', 'allows_patch', 'allows_compatible', 'allows_incompatible', 'upper_bounded', 'lower_bounded', 'strict']:
+        for label in ['empty', 'allows_major', 'allows_minor', 'allows_patch', 'allows_compatible', 'allows_incompatible', 'allows_all_compatible', 'allows_compatible_only', 'allows_all_compatible_only', 'upper_bounded', 'lower_bounded', 'strict']:
             df_constraints[label] = df_constraints['interval'].apply(getattr(analyzer, label))
         
         print('.. merge results')

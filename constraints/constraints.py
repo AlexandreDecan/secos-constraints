@@ -100,7 +100,7 @@ def dev(interval):
         raise TypeError('Parameter must be an Interval or an AtomicInterval instance.')
 
 
-def allows_compatible(interval, semver=False):
+def allows_all_compatible(interval, semver=False):
     if dev(interval):
         if semver:
             return True
@@ -108,7 +108,17 @@ def allows_compatible(interval, semver=False):
             return allows_patch(interval)
     else:
         return allows_minor(interval) and allows_patch(interval)
+
     
+def allows_compatible(interval, semver=False):
+    if dev(interval):
+        if semver:
+            return True
+        else:
+            return allows_patch(interval)
+    else:
+        return allows_minor(interval) or allows_patch(interval)
+
     
 def allows_incompatible(interval, semver=False):
     if dev(interval):
@@ -119,6 +129,14 @@ def allows_incompatible(interval, semver=False):
     else:
         return allows_major(interval)
 
+
+def allows_compatible_only(interval, semver=False):
+    return allows_compatible(interval, semver) and not allows_incompatible(interval, semver)
+    
+    
+def allows_all_compatible_only(interval, semver=False):
+    return allows_all_compatible(interval, semver) and not allows_incompatible(interval, semver)
+    
 
 def patch_interval(version):
     return I.closedopen(
