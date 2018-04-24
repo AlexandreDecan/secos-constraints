@@ -10,7 +10,7 @@ def upper_bounded(interval):
     if isinstance(interval, I.Interval):
         return upper_bounded(interval.to_atomic())
     elif isinstance(interval, I.AtomicInterval):
-        return interval.upper != I.inf
+        return interval.is_empty() or interval.upper != I.inf
     else:
         raise TypeError('Parameter must be an Interval or an AtomicInterval instance.')
 
@@ -83,9 +83,9 @@ def allows_patch(interval, soft=True):
 
 def dev(interval):
     if isinstance(interval, I.Interval):
-        # Whyt not all(dev(i) for i in interval)?
+        # Why not all(dev(i) for i in interval)?
         # .. because it returns True if interval is empty.
-        return not any([not dev(i) for i in interval])
+        return not any(not dev(i) for i in interval)
     elif isinstance(interval, I.AtomicInterval):
         return interval <= I.closedopen(Version(0, 0, 0), Version(1, 0, 0))
         # (
