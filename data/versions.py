@@ -29,17 +29,6 @@ if __name__ == '__main__':
         print('Converting components')
         for component in ['major', 'minor', 'patch']:
             df_versions[component] = df_versions[component].astype(float)
-            
-        # print('Dropping prereleases')
-        # df_versions = (
-        #     df_versions
-        #     .sort_values(['package', 'major', 'minor', 'patch', 'misc'])
-        #     .groupby(['package', 'major', 'minor', 'patch'], as_index=False, sort=False)
-        #     .first()
-        #     # Alternatively, but too restrictive:
-        #     # df_versions[lambda d: d['misc'] != '']
-        #     # .drop_duplicates(['package', 'major', 'minor', 'patch'])
-        # )
         
         print('Computing release order and release type')
         data = []
@@ -51,6 +40,8 @@ if __name__ == '__main__':
                 .drop_duplicates(['major', 'minor', 'patch'], keep='last')
                 .assign(
                     rank=lambda d: d.assign(N=1).N.cumsum(),
+                    # previous_date=lambda d: d['date'].shift(1),
+                    # next_date=lambda d: d['date'].shift(-1),
                     is_initial=lambda d: d['major'].shift(1).isnull(),
                     is_major=lambda d: (d['major'] - d['major'].shift(1)).clip(0, 1).astype(bool),
                     is_minor=lambda d: (d['minor'] - d['minor'].shift(1)).clip(0, 1).astype(bool),
@@ -58,7 +49,7 @@ if __name__ == '__main__':
                 )
             )
             data.append(group)
-            
+        
         print('Grouping results into a dataframe')
         df_semver = (
             pandas.concat(data)
