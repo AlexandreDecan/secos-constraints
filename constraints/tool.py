@@ -121,7 +121,7 @@ def main(platform, package_name, key):
     
     try:
         for (year, month), dependent in months.items():
-            print('Version constraint usage for {}-{}'.format(year, month))
+            
             dependencies = []
             for name, version in tqdm.tqdm(dependent.items(), leave=False):
                 version_data = get_url(DEPS_URL.format(platform=platform, package=quote_plus(name), version=version), {'key': key})
@@ -140,11 +140,11 @@ def main(platform, package_name, key):
                 
             dependencies = [parser.parse_or_empty(PARSER[platform], x) for x in dependencies]
             
-            total = M = m = p = 0
+            total = M = m = p = o = 0
             for dep in dependencies:
-                aM = constraints.allows_major(d)
-                am = constraints.allows_minor(d)
-                ap = constraints.allows_patch(d)
+                aM = constraints.allows_major(dep)
+                am = constraints.allows_minor(dep)
+                ap = constraints.allows_patch(dep)
                 total += 1
                 M += int(aM)
                 m += int(am)
@@ -156,11 +156,11 @@ def main(platform, package_name, key):
                 continue
             
             def f(v): return '*' * round(v / 0.2)
-            print(' - constraints:', total)
-            print(' - major:', f(M / total))
-            print(' - minor:', f(m / total))
-            print(' - patch:', f(p / total))
-            print(' - other:', f(o / total))
+            print('[{}-{:0>2}] ({:3} cons.)\tM {:<5}\tm {:<5}\tp {:<5}\to {:<5}'.format(
+                year, month,
+                total,
+                f(M / total), f(m / total), f(p / total), f(o / total)
+            ))
             logger.info(' / '.join([str(d) for d in dependencies]))
             
     except KeyboardInterrupt:
