@@ -65,7 +65,7 @@ def get_url(url, params=None):
             raise ValueError('"{}" returns code {}'.format(url, status_code))
 
 
-def main(platform, package_name, key):
+def main(platform, package_name, key, verbose):
     # Check that package exists
     r = get_url(PKG_URL.format(platform=platform, package=quote_plus(package_name)), {'key': key})
     if r is None:
@@ -156,11 +156,18 @@ def main(platform, package_name, key):
                 continue
             
             def f(v): return '*' * round(v / 0.2)
-            print('[{}-{:0>2}] ({:3} cons.)\tM {:<5}\tm {:<5}\tp {:<5}\to {:<5}'.format(
-                year, month,
-                total,
-                f(M / total), f(m / total), f(p / total), f(o / total)
-            ))
+            if verbose:
+                print('[{}-{:0>2}] ({:3} cons.)\tM {:<5}\tm {:<5}\tp {:<5}\to {:<5}'.format(
+                    year, month,
+                    total,
+                    f(M / total), f(m / total), f(p / total), f(o / total)
+                ))
+            else:
+                print('[{}-{:0>2}] ({:3} cons.)\tm {:<5}\tp {:<5}'.format(
+                    year, month,
+                    total,
+                    f(m / total), f(p / total)
+                ))
             logger.info(' / '.join([str(d) for d in dependencies]))
             
     except KeyboardInterrupt:
@@ -172,6 +179,7 @@ if __name__ == '__main__':
     argparser.add_argument('package_name', type=str, nargs=1, help='Name of the package')
     argparser.add_argument('--platform', choices=['NPM', 'Cargo', 'Packagist', 'Rubygems'], required=True, help='platform where package is hosted')
     argparser.add_argument('--key', type=str, required=True, help='API key for libraries.io')
+    argparser.add_argument('-v', '--verbose', action='store_true', required=False, help='Verbose mode')
     argparser.add_argument('--debug', action='store_true', required=False, help='Display debug information')
     
     args = argparser.parse_args()
@@ -179,4 +187,4 @@ if __name__ == '__main__':
     if args.debug:
         logger.setLevel(logging.DEBUG)
     
-    main(args.platform, args.package_name[0], args.key)
+    main(args.platform, args.package_name[0], args.key, args.verbose)
