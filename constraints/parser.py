@@ -187,15 +187,15 @@ class PackagistParser(InlineTransformer):
     disjunction: conjunction (("|" | "||") conjunction)*
     conjunction: constraint ([","] constraint)*
 
-    constraint: [OP] version           -> constraint_operator
+    constraint: [OP] version -> constraint_operator
               | version "-" version    -> constraint_range
     OP: "!=" | "=" | "<=" | "<" | ">=" | ">" | "~" | "^"
-    version: ("v" | "V")? MAJOR ("." MINOR ("." PATCH)? (("-" | "@") MISC)?)?
+    version: ["v" | "V"] MAJOR ["." MINOR ["." PATCH [MISC]]]
 
     MAJOR: INT | "*"
     MINOR: INT | "*"
     PATCH: INT | "*"
-    MISC: /[\.0-9A-Za-z-]+/
+    MISC: /[@\.0-9A-Za-z\-]+/
 
     %import common.INT
     %import common.WS
@@ -263,9 +263,9 @@ class PackagistParser(InlineTransformer):
         if op == '^':
             if major == 0:
                 # ^0.3 := >=0.3.0 < 0.4.0
-                return patch_interval(Version(major, minor, patch or 0))
+                return patch_interval(Version(major, minor or 0, patch or 0))
             else:
-                return minor_interval(Version(major, minor, patch or 0))
+                return minor_interval(Version(major, minor or 0, patch or 0))
         elif op == '~':
             if minor is None:
                 # ~1 := ~1.0
@@ -286,14 +286,15 @@ class PackagistParser(InlineTransformer):
         assert False, (op, version)
         
     def version(self, major, minor=None, patch=None, misc=None):
-        if patch is not None and not str.isdigit(patch):
+        if patch is not None and not (str.isdigit(patch) or patch == '*'):
             misc = patch
             patch = None
             
-        return tuple(
+        r = tuple(
             int(x) if (x is not None and str.isdigit(x)) else x
             for x in (major, minor, patch)
         )
+        return r
 
 
 class NPMParser(InlineTransformer):
