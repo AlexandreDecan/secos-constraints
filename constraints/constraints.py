@@ -82,6 +82,11 @@ def allows_patch(interval, soft=True):
 
 
 def dev(interval):
+    if interval.is_empty():
+        return False
+    else:
+        return interval[-1]._upper <= Version(1, 0 ,0)
+    """
     if isinstance(interval, I.Interval):
         # Why not all(dev(i) for i in interval)?
         # .. because it returns True if interval is empty.
@@ -98,6 +103,7 @@ def dev(interval):
         # )
     else:
         raise TypeError('Parameter must be an Interval or an AtomicInterval instance.')
+    """
 
 
 def allows_all_compatible(interval, semver=False):
