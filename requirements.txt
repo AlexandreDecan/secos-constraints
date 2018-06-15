@@ -22,8 +22,11 @@ jupyter==1.0.0
 jupyter-client==5.2.3
 jupyter-console==5.2.0
 jupyter-core==4.4.0
+jupyterlab==0.32.0
+jupyterlab-launcher==0.10.5
 kiwisolver==1.0.1
 lark-parser==0.5.6
+lifelines==0.14.1
 MarkupSafe==1.0
 matplotlib==2.2.2
 mistune==0.8.3
@@ -45,7 +48,7 @@ Pygments==2.2.0
 pyparsing==2.2.0
 pytest==3.5.0
 python-dateutil==2.7.2
-python-intervals==1.5.0
+python-intervals==1.5.2
 pytz==2018.3
 pyzmq==17.0.0
 qtconsole==4.3.1

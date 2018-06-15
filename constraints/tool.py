@@ -65,7 +65,7 @@ def get_url(url, params=None):
             raise ValueError('"{}" returns code {}'.format(url, status_code))
 
 
-def main(platform, package_name, key, verbose):
+def main(platform, package_name, key):
     # Check that package exists
     r = get_url(PKG_URL.format(platform=platform, package=quote_plus(package_name)), {'key': key})
     if r is None:
@@ -141,33 +141,32 @@ def main(platform, package_name, key, verbose):
             dependencies = [parser.parse_or_empty(PARSER[platform], x) for x in dependencies]
             
             total = M = m = p = o = 0
+            m_max = p_max = 0
             for dep in dependencies:
                 aM = constraints.allows_major(dep)
                 am = constraints.allows_minor(dep)
                 ap = constraints.allows_patch(dep)
+                am_max = am and not aM
+                ap_max = ap and not am
                 total += 1
                 M += int(aM)
                 m += int(am)
                 p += int(ap)
-                o += 1 - int(aM or am or ap)
+                m_max += int(am_max)
+                p_max += int(ap_max)
             
             if total == 0:
                 print('None collected')
                 continue
             
             def f(v): return '*' * round(v / 0.2)
-            if verbose:
-                print('[{}-{:0>2}] ({:3} cons.)\tM {:<5}\tm {:<5}\tp {:<5}\to {:<5}'.format(
-                    year, month,
-                    total,
-                    f(M / total), f(m / total), f(p / total), f(o / total)
-                ))
-            else:
-                print('[{}-{:0>2}] ({:3} cons.)\tm {:<5}\tp {:<5}'.format(
-                    year, month,
-                    total,
-                    f(m / total), f(p / total)
-                ))
+            
+            print('[{}-{:0>2}] ({:3} cons.)\tm {:<5}\tp {:<5}\tm max {:<5}\tp max {:<5}'.format(
+                year, month,
+                total,
+                f(m / total), f(p / total),
+                f(m_max / total), f(p_max / total),
+            ))
             logger.info(' / '.join([str(d) for d in dependencies]))
             
     except KeyboardInterrupt:
@@ -179,7 +178,6 @@ if __name__ == '__main__':
     argparser.add_argument('package_name', type=str, nargs=1, help='Name of the package')
     argparser.add_argument('--platform', choices=['NPM', 'Cargo', 'Packagist', 'Rubygems'], required=True, help='platform where package is hosted')
     argparser.add_argument('--key', type=str, required=True, help='API key for libraries.io')
-    argparser.add_argument('-v', '--verbose', action='store_true', required=False, help='Verbose mode')
     argparser.add_argument('--debug', action='store_true', required=False, help='Display debug information')
     
     args = argparser.parse_args()
@@ -187,4 +185,4 @@ if __name__ == '__main__':
     if args.debug:
         logger.setLevel(logging.DEBUG)
     
-    main(args.platform, args.package_name[0], args.key, args.verbose)
+    main(args.platform, args.package_name[0], args.key)
