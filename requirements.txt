@@ -48,7 +48,7 @@ Pygments==2.2.0
 pyparsing==2.2.0
 pytest==3.5.0
 python-dateutil==2.7.2
-python-intervals==1.5.2
+python-intervals==1.6.0
 pytz==2018.3
 pyzmq==17.0.0
 qtconsole==4.3.1
