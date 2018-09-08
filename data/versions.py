@@ -19,7 +19,26 @@ if __name__ == '__main__':
             continue
         
         print('Loading data for {}'.format(ecosystem))
-        df_versions = pandas.read_csv(INPUT_PATH.format(ecosystem))
+        df_versions = pandas.read_csv(INPUT_PATH.format(ecosystem)).dropna()
+        
+        # Remove funny packages from NPM
+        if ecosystem == 'NPM':
+            df_versions = (
+                df_versions
+                # March 2016
+                [lambda d: ~d['package'].str.startswith('@ryancavanaugh')]
+                [lambda d: ~d['package'].str.startswith('all-packages-')]
+                [lambda d: ~d['package'].str.startswith('cool-')]
+                [lambda d: ~d['package'].str.startswith('neat-')]
+                [lambda d: ~d['package'].str.startswith('wowdude-')]
+                
+                # April & May 2017
+                [lambda d: ~d['package'].str.startswith('npmdoc')]
+                [lambda d: ~d['package'].str.startswith('npmtest')]
+                [lambda d: ~d['package'].str.startswith('npm-ghost')]
+                [lambda d: ~d['package'].str.startswith('ghost-')]
+                [lambda d: ~d['package'].str.endswith('-cdn')]
+            )
         
         print('Identifying semver components')
         df_versions[['major', 'minor', 'patch', 'misc']] = (
