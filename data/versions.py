@@ -21,23 +21,17 @@ if __name__ == '__main__':
         print('Loading data for {}'.format(ecosystem))
         df_versions = pandas.read_csv(INPUT_PATH.format(ecosystem)).dropna()
         
-        # Remove funny packages from NPM
+        # Remove spam packages from NPM
         if ecosystem == 'NPM':
+            exclude_prefixes = ('@ryancavanaugh/pkg', 'all-packages-', 'cool-', 'neat-', 'wowdude-', 'npmdoc-', 'npmtest-', 'npm-ghost-',)
+            exclude_suffixes = ('-cdn',)
+            exclude_ghost = r'^ghost-\d+$'
+
             df_versions = (
                 df_versions
-                # March 2016
-                [lambda d: ~d['package'].str.startswith('@ryancavanaugh')]
-                [lambda d: ~d['package'].str.startswith('all-packages-')]
-                [lambda d: ~d['package'].str.startswith('cool-')]
-                [lambda d: ~d['package'].str.startswith('neat-')]
-                [lambda d: ~d['package'].str.startswith('wowdude-')]
-                
-                # April & May 2017
-                [lambda d: ~d['package'].str.startswith('npmdoc')]
-                [lambda d: ~d['package'].str.startswith('npmtest')]
-                [lambda d: ~d['package'].str.startswith('npm-ghost')]
-                [lambda d: ~d['package'].str.startswith('ghost-')]
-                [lambda d: ~d['package'].str.endswith('-cdn')]
+                [lambda d: ~d['package'].str.startswith(exclude_prefixes)]
+                [lambda d: ~d['package'].str.endswith(exclude_suffixes)]
+                [lambda d: ~d['package'].str.match(exclude_ghost)]
             )
         
         print('Identifying semver components')
