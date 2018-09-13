@@ -37,18 +37,6 @@ if __name__ == '__main__':
         df_dependencies = pandas.read_csv(DEPS_INPUT_PATH.format(ecosystem))
                 
         print('Filtering dependencies')
-        if ecosystem == 'NPM':
-            # For npm, remove packages starting with:
-            # - all-packages-
-            # - cool-
-            # - neat-
-            # - wowdude-
-            # This represents around 245 packages with have a very high number
-            # of dependencies, and are just "fun packages", as explained here:
-            # https://libraries.io/npm/wowdude-119
-            print('.. removing "fun packages" from NPM')
-            filtered = ('all-packages-', 'cool-', 'neat-', 'wowdude-', )
-            df_dependencies = df_dependencies[~df_dependencies['package'].str.startswith(filtered)]
 
         df_dependencies = (
             df_dependencies
