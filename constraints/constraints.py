@@ -85,7 +85,7 @@ def dev(interval):
     if interval.is_empty():
         return False
     else:
-        return interval[-1]._upper <= Version(1, 0 ,0)
+        return interval[-1]._upper < Version(1, 0 ,0) or (interval[-1]._upper == Version(1, 0, 0) and interval[-1]._right == I.OPEN)
     """
     if isinstance(interval, I.Interval):
         # Why not all(dev(i) for i in interval)?
