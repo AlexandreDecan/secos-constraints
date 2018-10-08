@@ -140,32 +140,32 @@ def main(platform, package_name, key):
                 
             dependencies = [parser.parse_or_empty(PARSER[platform], x) for x in dependencies]
             
-            total = M = m = p = o = 0
-            m_max = p_max = 0
-            for dep in dependencies:
-                aM = constraints.allows_major(dep)
-                am = constraints.allows_minor(dep)
-                ap = constraints.allows_patch(dep)
-                am_max = am and not aM
-                ap_max = ap and not am
-                total += 1
-                M += int(aM)
-                m += int(am)
-                p += int(ap)
-                m_max += int(am_max)
-                p_max += int(ap_max)
+            total = 0
+            compliant = 0
+            permissive = 0
+            restrictive = 0
             
+            for dep in dependencies:
+                major = constraints.allows_major(dep)
+                minor = constraints.allows_minor(dep)
+                patch = constraints.allows_patch(dep)
+                dev = constraints.dev(dep)
+                
+                total += 1
+                compliant += int((not major and minor and not dev) or (dev and not patch))
+                permissive += int(major or (dev and patch))
+                restrictive += int(not minor and not dev)
+                
             if total == 0:
                 print('None collected')
                 continue
             
-            def f(v): return '*' * round(v / 0.2)
-            
-            print('[{}-{:0>2}] ({:3} cons.)\tm {:<5}\tp {:<5}\tm max {:<5}\tp max {:<5}'.format(
+            print('[{}-{:0>2}] ({:3} cons.)\t {:.1%} compl. / {:.1%} perm. / {:.1%} restr.'.format(
                 year, month,
                 total,
-                f(m / total), f(p / total),
-                f(m_max / total), f(p_max / total),
+                compliant / total,
+                permissive / total,
+                restrictive / total,
             ))
             logger.info(' / '.join([str(d) for d in dependencies]))
             
