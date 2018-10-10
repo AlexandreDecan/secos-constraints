@@ -1,0 +1,19 @@
+This is the replication package for our (unpublished) paper on dependency constraints and semantic versioning. This replication package is not yet in a final state, and will be documented and cleaned upon acceptance of the paper. 
+
+This package requires Python 3.5+, and all the dependencies listed in *requirements.txt*. They can be automatically installed using *pip install -r requirements.txt*. 
+
+The figures and results that are contained in the paper could be obtained by running the corresponding notebooks with Jupyter (*jupyter lab* at the root of this package). 
+
+Here is a short description of what is contained in this package: 
+
+ * Raw datasets (*data-raw* folder)
+   This folder "should" contain the raw data. Because of their size, and because we provide the required files in the *data* folder, you need to download *Libraries.io-open-data-1.2.0.tar.gz* from libraries.io. Extract *versions.csv* and *dependencies.csv* from this archive, and run the *convert.py* script with Python. The script will extract the data related to the four considered ecosystems into *{ecosystem}-(versions|dependencies).csv.gz*. 
+   
+ * Datasets (*data* folder)
+   This folder contains the data that are required for the analyses. They are provided in this replication package, but can be automatically generated from the ones provided in *data-raw* folder by running the *versions.py* and *dependencies.py* scripts. These scripts collect and identify dependency constraints.
+   
+ * Notebooks (*notebooks* folder)
+   This folder contains the notebooks that were used to generate all the results and figures of the paper. File *Constraint differences.ipynb* contains examples of constraints and the corresponding equivalent intervals. The main notebook is *Semver compliance.ipynb* and contains all the necessary material.
+   
+ * Python modules (*constraints* folder)
+   This folder contains the necessary Python modules to run "everything". File *parser.py* contains the 4 dependency constraint parsers. File *versions.py* defines data model. File *constraints.py* contains routines to identify constraint types. The *tool.py* script is a prototype of the tool explained in the paper (and should be executed from the root directory, e.g. *python -m constraints.tool*). All these modules/scripts/tools depend on *python-interval* (see *requirements.txt*). The three remaining files (*test_constraints.py*, *test_parser.py* and *test_versions.py*) contain unit tests. They are expected to be executed with *pytest*.
