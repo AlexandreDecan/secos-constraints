@@ -1,4 +1,7 @@
-This is the replication package for our (unpublished) paper on dependency constraints and semantic versioning. This replication package is not yet in a final state, and will be documented and cleaned upon acceptance of the paper. 
+This is the replication package for our paper on dependency constraints and semantic versioning. 
+What Do Package Dependencies Tell Us about Semantic Versioning?
+Alexandre Decan, Tom Mens
+in IEEE Transactions on Software Engineering, 10.1109/TSE.2019.2918315
 
 This package requires Python 3.5+, and all the dependencies listed in *requirements.txt*. They can be automatically installed using *pip install -r requirements.txt*. 
 
